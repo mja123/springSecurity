@@ -1,0 +1,24 @@
+services:
+  postgres:
+    image: 'postgres:13.22-alpine3.21'
+    restart: always
+    environment:
+      POSTGRES_URL: ${POSTGRES_URL}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - ./volumes/postgres:/data/postgres
+    ports:
+      - "5432:5432"
+  pgadmin:
+    image: 'elestio/pgadmin:REL-9_8'
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PG_ADMIN_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PG_ADMIN_PASSWORD}
+      PGADMIN_LISTEN_PORT: 8080
+    ports:
+      - "8081:8080"
+    volumes:
+      - ./volumes/pgadmin/servers.json:/pgadmin4/servers.json
