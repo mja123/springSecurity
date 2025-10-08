@@ -23,7 +23,8 @@ public class UserController {
     @GetMapping
     public ResponseEntity<List<UserDTO>> getAllUsers() {
         List<UserDTO> userDTOS = userService.getAllUsers();
-        if (!userDTOS.isEmpty())
+
+        if (userDTOS.isEmpty())
             return ResponseEntity.ok(userDTOS);
         return ResponseEntity.accepted().body(userDTOS);
     }
