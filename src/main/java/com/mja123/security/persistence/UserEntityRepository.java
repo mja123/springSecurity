@@ -19,4 +19,10 @@ public class UserEntityRepository implements UserRepository {
     public List<UserEntity> getAll() {
         return (List<UserEntity>) userCRUD.findAll();
     }
+
+    @Override
+    public UserEntity add(UserEntity user) {
+        return userCRUD.save(user);
+    }
+
 }

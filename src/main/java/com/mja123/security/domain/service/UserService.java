@@ -20,4 +20,8 @@ public class UserService {
     public List<UserDTO> getAllUsers() {
         return userMapper.entitiesToUsers(userRepository.getAll());
     }
+
+    public UserDTO addUser(UserDTO userDTO) {
+        return userMapper.entityToUser(userRepository.add(userMapper.userToEntity(userDTO)));
+    }
 }

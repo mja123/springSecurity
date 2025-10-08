@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.sql.Date;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "users")
@@ -22,5 +23,12 @@ public class UserEntity {
     @Column(nullable = false, unique = true)
     private String email;
     @Column(nullable = false, name = "created_at")
-    private Date createdAt;
+    private LocalDateTime createdAt;
+
+    @PrePersist
+    private void onCreate() {
+        if (createdAt == null) {
+            createdAt = LocalDateTime.now().withNano(0);
+        }
+    }
 }
