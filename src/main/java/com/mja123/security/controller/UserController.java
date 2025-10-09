@@ -29,8 +29,8 @@ public class UserController {
         return ResponseEntity.accepted().body(userDTOS);
     }
 
-    @GetMapping("{id}")
-    public ResponseEntity<UserDTO> getUser(@RequestParam long id) {
+    @GetMapping("/{id}")
+    public ResponseEntity<UserDTO> getUser(@PathVariable long id) {
         try {
             return ResponseEntity.ok(userService.getUser(id));
         } catch (NotFoundException error) {
