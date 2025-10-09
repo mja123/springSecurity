@@ -2,6 +2,8 @@ package com.mja123.security.domain.service;
 
 import com.mja123.security.domain.dto.UserDTO;
 import com.mja123.security.domain.repository.UserRepository;
+import com.mja123.security.exceptions.NotFoundException;
+import com.mja123.security.persistence.entity.UserEntity;
 import com.mja123.security.persistence.mapper.UserMapper;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +21,13 @@ public class UserService {
 
     public List<UserDTO> getAllUsers() {
         return userMapper.entitiesToUsers(userRepository.getAll());
+    }
+
+    public UserDTO getUser(long id) throws NotFoundException {
+
+        UserEntity userEntity = userRepository.getById(id);
+        if (userEntity == null) throw new NotFoundException("User not found");
+        return userMapper.entityToUser(userEntity);
     }
 
     public UserDTO addUser(UserDTO userDTO) {

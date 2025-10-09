@@ -6,5 +6,6 @@ import java.util.List;
 
 public interface UserRepository {
     List<UserEntity> getAll();
+    UserEntity getById(long id);
     UserEntity add(UserEntity user);
 }

@@ -2,6 +2,7 @@ package com.mja123.security.controller;
 
 import com.mja123.security.domain.dto.UserDTO;
 import com.mja123.security.domain.service.UserService;
+import com.mja123.security.exceptions.NotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -26,6 +27,15 @@ public class UserController {
         if (userDTOS.isEmpty())
             return ResponseEntity.ok(userDTOS);
         return ResponseEntity.accepted().body(userDTOS);
+    }
+
+    @GetMapping("{id}")
+    public ResponseEntity<UserDTO> getUser(@RequestParam long id) {
+        try {
+            return ResponseEntity.ok(userService.getUser(id));
+        } catch (NotFoundException error) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @PostMapping

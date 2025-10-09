@@ -21,6 +21,11 @@ public class UserEntityRepository implements UserRepository {
     }
 
     @Override
+    public UserEntity getById(long id) {
+        return userCRUD.findById(id).orElse(null);
+    }
+
+    @Override
     public UserEntity add(UserEntity user) {
         return userCRUD.save(user);
     }
