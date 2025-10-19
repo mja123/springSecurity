@@ -1,5 +1,6 @@
 package com.mja123.security.controller;
 
+import com.mja123.security.domain.dto.UpdateUserDTO;
 import com.mja123.security.domain.dto.UserDTO;
 import com.mja123.security.domain.service.UserService;
 import com.mja123.security.exceptions.NotFoundException;
@@ -41,5 +42,10 @@ public class UserController {
     @PostMapping
     public ResponseEntity<UserDTO> addUser(@RequestBody UserDTO userDTO) {
         return ResponseEntity.status(HttpStatus.CREATED).body(userService.addUser(userDTO));
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<UserDTO> updateUser(@PathVariable long id, UpdateUserDTO userData) {
+        return ResponseEntity.ok(userService.updateUser(id, userData));
     }
 }

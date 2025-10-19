@@ -1,5 +1,6 @@
 package com.mja123.security.domain.service;
 
+import com.mja123.security.domain.dto.UpdateUserDTO;
 import com.mja123.security.domain.dto.UserDTO;
 import com.mja123.security.domain.repository.UserRepository;
 import com.mja123.security.exceptions.NotFoundException;
@@ -32,5 +33,9 @@ public class UserService {
 
     public UserDTO addUser(UserDTO userDTO) {
         return userMapper.entityToUser(userRepository.add(userMapper.userToEntity(userDTO)));
+    }
+
+    public UserDTO updateUser(long id, UpdateUserDTO userDTO) {
+        return userMapper.entityToUser(userRepository.update(userMapper.userToEntity(userDTO)));
     }
 }

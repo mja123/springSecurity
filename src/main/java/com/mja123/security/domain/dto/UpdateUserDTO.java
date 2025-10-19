@@ -1,7 +1,6 @@
 package com.mja123.security.domain.dto;
 
-public record UserDTO(
-    Long id,
+public record UpdateUserDTO (
     String name,
     String lastname,
     String email

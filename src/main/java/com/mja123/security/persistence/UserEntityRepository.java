@@ -1,6 +1,7 @@
 package com.mja123.security.persistence;
 
 import com.mja123.security.domain.repository.UserRepository;
+import com.mja123.security.exceptions.NotFoundException;
 import com.mja123.security.persistence.crud.UserCRUD;
 import com.mja123.security.persistence.entity.UserEntity;
 import org.springframework.stereotype.Repository;
@@ -30,4 +31,14 @@ public class UserEntityRepository implements UserRepository {
         return userCRUD.save(user);
     }
 
+    @Override
+    public UserEntity update(long id, UserEntity user) throws NotFoundException {
+        UserEntity userEntity = userCRUD.findById(id).orElse(null);
+
+        if (userEntity == null) {
+            throw new NotFoundException("User with id " + id + " was not found.");
+        }
+        userEntity.set
+        return userEntity;
+    }
 }
