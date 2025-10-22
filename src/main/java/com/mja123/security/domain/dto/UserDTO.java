@@ -5,4 +5,4 @@ public record UserDTO(
     String name,
     String lastname,
     String email
-) implements IDTO {}
+) implements IUserDTO {}

@@ -1,6 +1,5 @@
 package com.mja123.security.utils;
 
-import com.mja123.security.domain.dto.IDTO;
 import com.mja123.security.persistence.entity.IEntity;
 
 import java.lang.reflect.InvocationTargetException;
@@ -36,14 +35,22 @@ public class ParsingUtil {
         return notEmptyAttribute;
     }
 
-    // Fix it
-    public static Class<?> setMethodsFromEntity(String attribute, Object value, Class<?> objectClass) {
+    /*
+        Set value in a dto via setters
+     */
+    public static void setMethodsFromEntity(String attribute, Object value, Class<?> classObject) {
         String setter = "set".concat(attribute);
         try {
-            objectClass.getMethod(setter).invoke(objectClass, value);
+            classObject.getMethod(setter).invoke(classObject, value);
         } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
             throw new RuntimeException(e);
         }
+    }
 
+    public static void setAttributesFromEntityToEntity(IEntity origin, IEntity target) {
+        List<Method> entityMethods = Arrays.stream(origin.getClass().getMethods()).toList();
+
+        Map<String, Object> entityAttributes = getNotEmptyAttribute(entityMethods, origin.getClass());
+        entityAttributes.forEach((a,v) -> setMethodsFromEntity(a, v, target.getClass()));
     }
 }

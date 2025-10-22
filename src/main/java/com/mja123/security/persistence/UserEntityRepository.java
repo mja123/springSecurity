@@ -4,6 +4,7 @@ import com.mja123.security.domain.repository.UserRepository;
 import com.mja123.security.exceptions.NotFoundException;
 import com.mja123.security.persistence.crud.UserCRUD;
 import com.mja123.security.persistence.entity.UserEntity;
+import com.mja123.security.utils.ParsingUtil;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -38,7 +39,7 @@ public class UserEntityRepository implements UserRepository {
         if (userEntity == null) {
             throw new NotFoundException("User with id " + id + " was not found.");
         }
-        userEntity.set
-        return userEntity;
+        ParsingUtil.setAttributesFromEntityToEntity(userEntity, user);
+        return user;
     }
 }

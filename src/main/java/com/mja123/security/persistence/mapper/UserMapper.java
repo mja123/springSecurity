@@ -1,13 +1,11 @@
 package com.mja123.security.persistence.mapper;
 
-import com.mja123.security.domain.dto.UpdateUserDTO;
+import com.mja123.security.domain.dto.IUserDTO;
 import com.mja123.security.domain.dto.UserDTO;
 import com.mja123.security.persistence.entity.UserEntity;
+import com.mja123.security.utils.ParsingUtil;
 import org.mapstruct.*;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.Arrays;
 import java.util.List;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
@@ -18,11 +16,6 @@ public interface UserMapper {
     @Mapping(target = "email", source = "email")
     UserDTO entityToUser(UserEntity entity);
     @InheritInverseConfiguration
-    UserEntity userToEntity(UserDTO userDTO);
+    UserEntity userToEntity(IUserDTO userDTO);
     List<UserDTO> entitiesToUsers(Iterable<UserEntity> entity);
-
-    default void updateUserToEntity(UpdateUserDTO updateUser, UserEntity user) {
-
-    }
-
 }

@@ -36,6 +36,10 @@ public class UserService {
     }
 
     public UserDTO updateUser(long id, UpdateUserDTO userDTO) {
-        return userMapper.entityToUser(userRepository.update(userMapper.userToEntity(userDTO)));
+        try {
+            return userMapper.entityToUser(userRepository.update(id, userMapper.userToEntity(userDTO)));
+        } catch (NotFoundException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
