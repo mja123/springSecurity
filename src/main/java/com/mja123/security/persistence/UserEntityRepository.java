@@ -33,13 +33,14 @@ public class UserEntityRepository implements UserRepository {
     }
 
     @Override
-    public UserEntity update(long id, UserEntity user) throws NotFoundException {
+    public UserEntity update(long id, UserEntity updatedUser) throws NotFoundException {
         UserEntity userEntity = userCRUD.findById(id).orElse(null);
 
         if (userEntity == null) {
             throw new NotFoundException("User with id " + id + " was not found.");
         }
-        ParsingUtil.setAttributesFromEntityToEntity(userEntity, user);
-        return user;
+        ParsingUtil.setAttributesFromEntityToEntity(userEntity, updatedUser);
+        userCRUD.save(userEntity);
+        return userEntity;
     }
 }
