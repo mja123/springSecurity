@@ -25,9 +25,8 @@ public class UserService {
     }
 
     public UserDTO getUser(long id) throws NotFoundException {
-
-        UserEntity userEntity = userRepository.getById(id);
-        if (userEntity == null) throw new NotFoundException("User not found");
+        UserEntity userEntity = userRepository.getById(id).orElse(null);
+        if (userEntity == null) throw new NotFoundException("User with id " + id + " not found");
         return userMapper.entityToUser(userEntity);
     }
 
@@ -35,12 +34,17 @@ public class UserService {
         return userMapper.entityToUser(userRepository.add(userMapper.userToEntity(userDTO)));
     }
 
-    public UserDTO updateUser(long id, UpdateUserDTO userDTO) {
-        try {
-            UserEntity userEntity = userMapper.updateUserToEntity(userDTO);
-            return userMapper.entityToUser(userRepository.update(id, userEntity));
-        } catch (NotFoundException e) {
-            throw new RuntimeException(e);
-        }
+    public UserDTO updateUser(long id, UpdateUserDTO userDTO) throws NotFoundException {
+        UserEntity userEntity = userMapper.updateUserToEntity(userDTO);
+        UserEntity updatedUser = userRepository.update(id, userEntity).orElse(null);
+        if (updatedUser == null) throw new NotFoundException("User with id " + id + " not found");
+
+        return userMapper.entityToUser(updatedUser);
+    }
+
+    public UserDTO deleteUser(long id) throws NotFoundException {
+        UserEntity userEntity = userRepository.delete(id).orElse(null);
+        if (userEntity == null) throw new NotFoundException("User with id " + id + " not found");
+        return userMapper.entityToUser(userEntity);
     }
 }

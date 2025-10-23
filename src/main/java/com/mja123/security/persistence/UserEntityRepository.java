@@ -8,6 +8,7 @@ import com.mja123.security.utils.ParsingUtil;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public class UserEntityRepository implements UserRepository {
@@ -23,8 +24,9 @@ public class UserEntityRepository implements UserRepository {
     }
 
     @Override
-    public UserEntity getById(long id) {
-        return userCRUD.findById(id).orElse(null);
+    public Optional<UserEntity> getById(long id)
+    {
+        return userCRUD.findById(id);
     }
 
     @Override
@@ -33,14 +35,22 @@ public class UserEntityRepository implements UserRepository {
     }
 
     @Override
-    public UserEntity update(long id, UserEntity updatedUser) throws NotFoundException {
+    public Optional<UserEntity> update(long id, UserEntity updatedUser) {
         UserEntity userEntity = userCRUD.findById(id).orElse(null);
 
-        if (userEntity == null) {
-            throw new NotFoundException("User with id " + id + " was not found.");
+        if (userEntity != null) {
+            ParsingUtil.setAttributesFromEntityToEntity(userEntity, updatedUser);
+            userCRUD.save(userEntity);
         }
-        ParsingUtil.setAttributesFromEntityToEntity(userEntity, updatedUser);
-        userCRUD.save(userEntity);
-        return userEntity;
+        return Optional.ofNullable(userEntity);
+    }
+
+    @Override
+    public Optional<UserEntity> delete(long id) {
+        UserEntity user = userCRUD.findById(id).orElse(null);
+        if (user != null) {
+            userCRUD.delete(user);
+        }
+        return Optional.ofNullable(user);
     }
 }

@@ -46,6 +46,19 @@ public class UserController {
 
     @PutMapping("/{id}")
     public ResponseEntity<UserDTO> updateUser(@PathVariable long id, @RequestBody UpdateUserDTO userData) {
-        return ResponseEntity.ok(userService.updateUser(id, userData));
+        try {
+            return ResponseEntity.ok(userService.updateUser(id, userData));
+        } catch (NotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<UserDTO> deleteUser(@PathVariable long id) {
+        try {
+            return ResponseEntity.ok(userService.deleteUser(id));
+        } catch (NotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 }

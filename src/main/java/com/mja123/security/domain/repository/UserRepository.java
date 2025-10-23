@@ -1,13 +1,14 @@
 package com.mja123.security.domain.repository;
 
-import com.mja123.security.exceptions.NotFoundException;
 import com.mja123.security.persistence.entity.UserEntity;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface UserRepository {
     List<UserEntity> getAll();
-    UserEntity getById(long id);
+    Optional<UserEntity> getById(long id);
     UserEntity add(UserEntity user);
-    UserEntity update(long id, UserEntity user) throws NotFoundException;
+    Optional<UserEntity> update(long id, UserEntity user);
+    Optional<UserEntity> delete(long id);
 }
