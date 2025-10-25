@@ -4,6 +4,7 @@ import com.mja123.security.domain.dto.UpdateUserDTO;
 import com.mja123.security.domain.dto.UserDTO;
 import com.mja123.security.domain.repository.UserRepository;
 import com.mja123.security.exceptions.NotFoundException;
+import com.mja123.security.exceptions.NotUniqueAttributeException;
 import com.mja123.security.persistence.entity.UserEntity;
 import com.mja123.security.persistence.mapper.UserMapper;
 import org.springframework.stereotype.Service;
@@ -30,7 +31,7 @@ public class UserService {
         return userMapper.entityToUser(userEntity);
     }
 
-    public UserDTO addUser(UserDTO userDTO) {
+    public UserDTO addUser(UserDTO userDTO) throws NotUniqueAttributeException {
         return userMapper.entityToUser(userRepository.add(userMapper.userToEntity(userDTO)));
     }
 

@@ -2,6 +2,7 @@ package com.mja123.security.persistence;
 
 import com.mja123.security.domain.repository.UserRepository;
 import com.mja123.security.exceptions.NotFoundException;
+import com.mja123.security.exceptions.NotUniqueAttributeException;
 import com.mja123.security.persistence.crud.UserCRUD;
 import com.mja123.security.persistence.entity.UserEntity;
 import com.mja123.security.utils.ParsingUtil;
@@ -30,7 +31,10 @@ public class UserEntityRepository implements UserRepository {
     }
 
     @Override
-    public UserEntity add(UserEntity user) {
+    public UserEntity add(UserEntity user) throws NotUniqueAttributeException {
+        if (userCRUD.findUserByEmail(user.getEmail()) != null) {
+            throw new NotUniqueAttributeException("Email is already registered!");
+        }
         return userCRUD.save(user);
     }
 

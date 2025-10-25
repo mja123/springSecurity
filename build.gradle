@@ -25,6 +25,9 @@ dependencies {
     // Spring Web
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 
+    // Validation
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+
     // Lombok
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
@@ -32,6 +35,9 @@ dependencies {
     // Mapper
     implementation 'org.mapstruct:mapstruct:1.6.3'
     annotationProcessor 'org.mapstruct:mapstruct-processor:1.6.3'
+
+    // Documentation
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.13'
 
     // --- Database ---
     // Spring JPA

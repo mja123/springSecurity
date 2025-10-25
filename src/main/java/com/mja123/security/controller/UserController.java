@@ -4,6 +4,8 @@ import com.mja123.security.domain.dto.UpdateUserDTO;
 import com.mja123.security.domain.dto.UserDTO;
 import com.mja123.security.domain.service.UserService;
 import com.mja123.security.exceptions.NotFoundException;
+import com.mja123.security.exceptions.NotUniqueAttributeException;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -40,25 +42,19 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseEntity<UserDTO> addUser(@RequestBody UserDTO userDTO) {
+    public ResponseEntity<UserDTO> addUser(@RequestBody @Valid UserDTO userDTO) throws NotUniqueAttributeException {
         return ResponseEntity.status(HttpStatus.CREATED).body(userService.addUser(userDTO));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<UserDTO> updateUser(@PathVariable long id, @RequestBody UpdateUserDTO userData) {
-        try {
-            return ResponseEntity.ok(userService.updateUser(id, userData));
-        } catch (NotFoundException e) {
-            return ResponseEntity.notFound().build();
-        }
+    public ResponseEntity<UserDTO> updateUser(@PathVariable long id, @RequestBody @Valid UpdateUserDTO userData)
+            throws NotFoundException {
+        return ResponseEntity.ok(userService.updateUser(id, userData));
+
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<UserDTO> deleteUser(@PathVariable long id) {
-        try {
-            return ResponseEntity.ok(userService.deleteUser(id));
-        } catch (NotFoundException e) {
-            return ResponseEntity.notFound().build();
-        }
+    public ResponseEntity<UserDTO> deleteUser(@PathVariable long id) throws NotFoundException {
+        return ResponseEntity.ok(userService.deleteUser(id));
     }
 }
