@@ -5,6 +5,7 @@ public enum ErrorTypes {
     NOT_FOUND("not-found-error"),
     ARGUMENT_VALIDATION("argument-validation-error"),
     ARGUMENT_MISMATCH("argument-type-mismatch-error"),
+    ACCESS_DENIED("access-denied-error"),
     UNKNOWN_ERROR("unknown-error");
 
     final String error;

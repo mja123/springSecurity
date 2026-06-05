@@ -4,6 +4,7 @@ import com.mja123.security.exceptions.NotFoundException;
 import com.mja123.security.exceptions.NotUniqueAttributeException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -51,6 +52,14 @@ public class RestExceptionHandler {
                 .badRequest()
                 .body(errorResponse);
     }
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ErrorResponse> accessDeniedHandler(AccessDeniedException exception) {
+        ErrorResponse errorResponse = new ErrorResponse(ErrorTypes.ACCESS_DENIED.error, "You do not have permission to access this resource");
+        return ResponseEntity
+                .status(HttpStatus.FORBIDDEN)
+                .body(errorResponse);
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> exceptionHandler(Exception exception) {
         ErrorResponse errorResponse = new ErrorResponse(ErrorTypes.UNKNOWN_ERROR.error, exception.getMessage());
