@@ -1,7 +1,9 @@
 package com.mja123.security.controller.exceptions;
 
+import com.mja123.security.exceptions.InvalidCredentialsException;
 import com.mja123.security.exceptions.NotFoundException;
 import com.mja123.security.exceptions.NotUniqueAttributeException;
+import com.mja123.security.exceptions.SignUpException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
@@ -52,6 +54,22 @@ public class RestExceptionHandler {
                 .badRequest()
                 .body(errorResponse);
     }
+    @ExceptionHandler(InvalidCredentialsException.class)
+    public ResponseEntity<ErrorResponse> invalidCredentialsHandler(InvalidCredentialsException exception) {
+        ErrorResponse errorResponse = new ErrorResponse(ErrorTypes.INVALID_CREDENTIALS.error, exception.getMessage());
+        return ResponseEntity
+                .status(HttpStatus.UNAUTHORIZED)
+                .body(errorResponse);
+    }
+
+    @ExceptionHandler(SignUpException.class)
+    public ResponseEntity<ErrorResponse> signUpHandler(SignUpException exception) {
+        ErrorResponse errorResponse = new ErrorResponse(ErrorTypes.SIGN_UP_ERROR.error, exception.getMessage());
+        return ResponseEntity
+                .badRequest()
+                .body(errorResponse);
+    }
+
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<ErrorResponse> accessDeniedHandler(AccessDeniedException exception) {
         ErrorResponse errorResponse = new ErrorResponse(ErrorTypes.ACCESS_DENIED.error, "You do not have permission to access this resource");

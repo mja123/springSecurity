@@ -6,6 +6,8 @@ public enum ErrorTypes {
     ARGUMENT_VALIDATION("argument-validation-error"),
     ARGUMENT_MISMATCH("argument-type-mismatch-error"),
     ACCESS_DENIED("access-denied-error"),
+    INVALID_CREDENTIALS("invalid-credentials-error"),
+    SIGN_UP_ERROR("sign-up-error"),
     UNKNOWN_ERROR("unknown-error");
 
     final String error;
