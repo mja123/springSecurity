@@ -1,0 +1,82 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: spring-security-api
+  labels:
+    app: spring-security-api
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: spring-security-api
+  template:
+    metadata:
+      labels:
+        app: spring-security-api
+    spec:
+      containers:
+        - name: spring-security-api
+          # Replace with the image you build & push for this app.
+          image: springsecurity-api:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 8080
+          env:
+            # --- Non-sensitive configuration ---
+            - name: SPRING_PROFILES_ACTIVE
+              value: "dev"
+            - name: AUTH0_ISSUER_URI
+              value: "https://dev-azluavxkf1bgtm4g.us.auth0.com/"
+            - name: AUTH0_AUDIENCE
+              value: "https://spring-api"
+            - name: AUTH0_ROLES_CLAIM_NAMESPACE
+              value: "https://spring-api/roles"
+            - name: AUTH0_CONNECTION
+              value: "Username-Password-Authentication"
+            # --- Sensitive configuration ---
+            # Provided by the Secret created manually via CLI, e.g.:
+            #   kubectl create secret generic spring-security-api-secret \
+            #     --from-literal=POSTGRES_URL='jdbc:postgresql://postgres:5432/security?user=...&password=...' \
+            #     --from-literal=AUTH0_CLIENT_ID='...' \
+            #     --from-literal=AUTH0_CLIENT_SECRET='...'
+            - name: POSTGRES_URL
+              valueFrom:
+                secretKeyRef:
+                  name: spring-security-api-secret
+                  key: POSTGRES_URL
+            - name: AUTH0_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: spring-security-api-secret
+                  key: AUTH0_CLIENT_ID
+            - name: AUTH0_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: spring-security-api-secret
+                  key: AUTH0_CLIENT_SECRET
+          # Liveness: restart the pod if the app stops responding.
+          livenessProbe:
+            httpGet:
+              path: /api/public/health
+              port: http
+            initialDelaySeconds: 45
+            periodSeconds: 15
+            timeoutSeconds: 3
+            failureThreshold: 3
+          # Readiness: only route traffic once the public health endpoint is up.
+          readinessProbe:
+            httpGet:
+              path: /api/public/health
+              port: http
+            initialDelaySeconds: 20
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 3
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "512Mi"
+            limits:
+              cpu: "1"
+              memory: "1Gi"

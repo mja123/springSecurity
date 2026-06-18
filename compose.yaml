@@ -11,14 +11,3 @@ services:
       - ./volumes/postgres:/data/postgres
     ports:
       - "5433:5432"
-  pgadmin:
-    image: 'elestio/pgadmin:REL-9_8'
-    restart: always
-    environment:
-      PGADMIN_DEFAULT_EMAIL: ${PG_ADMIN_EMAIL}
-      PGADMIN_DEFAULT_PASSWORD: ${PG_ADMIN_PASSWORD}
-      PGADMIN_LISTEN_PORT: 8080
-    ports:
-      - "8081:8080"
-    volumes:
-      - ./volumes/pgadmin/servers.json:/pgadmin4/servers.json

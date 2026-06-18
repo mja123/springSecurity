@@ -1,0 +1,24 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: spring-security-api
+  labels:
+    app: spring-security-api
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: spring-security.local
+      http:
+        paths:
+          # The API is served under the /api context-path. The frontend repo's
+          # Ingress adds the "/" rule on this same host; nginx merges them and
+          # routes the more specific /api/* prefix here first.
+          - path: /api
+            pathType: Prefix
+            backend:
+              service:
+                name: spring-security-api
+                port:
+                  name: http
