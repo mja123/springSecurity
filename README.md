@@ -1,101 +1,220 @@
-# Security app with Spring Security and Auth0
-## Description
-Spring Boot REST API secured with Auth0 and Spring Security OAuth2 Resource Server. Implements JWT-based authentication and authorization with support for Auth0 permissions and roles.
+# springSecurity — Spring Boot REST API with Auth0 & PostgreSQL
+
+Spring Boot 3.5.6 REST API secured with Auth0 and Spring Security OAuth2 Resource Server. Implements JWT-based authentication and authorization with role-based access control (RBAC) and permission-based authorization backed by a PostgreSQL database.
+
+## Tech stack
+
+| Layer | Technology |
+| --- | --- |
+| Runtime | Java 21 (Eclipse Temurin) |
+| Framework | Spring Boot 3.5.6 |
+| Security | Spring Security + OAuth2 Resource Server |
+| Identity | Auth0 (JWT) |
+| Database | PostgreSQL 16 |
+| ORM | Spring Data JPA + Hibernate |
+| Docs | SpringDoc OpenAPI (Swagger UI at `/swagger-ui.html`) |
+| Build | Gradle (Wrapper included) |
+| Container | Docker multi-stage build |
 
 ## Features
-- ✅ Auth0 JWT authentication
-- ✅ Role-based access control (RBAC)
-- ✅ Permission-based authorization
-- ✅ Public endpoints (no authentication required)
-- ✅ Protected user management endpoints
-- ✅ Method-level security with `@PreAuthorize`
-- ✅ CORS configuration
-- ✅ Security headers
 
-## Auth0 Setup
-
-1. **Create an Auth0 Account** (if you don't have one)
-   - Go to [Auth0](https://auth0.com) and sign up
-
-2. **Create an API in Auth0 Dashboard**
-   - Navigate to Applications > APIs
-   - Click "Create API"
-   - Set an identifier (this is your `AUTH0_AUDIENCE`)
-   - Note your Auth0 domain (e.g., `your-tenant.auth0.com`)
-
-3. **Configure Roles and Permissions** (Optional but recommended)
-   - Go to User Management > Roles
-   - Create roles: `ADMIN`, `USER`
-   - Go to APIs > Your API > Permissions
-   - Create permissions: `read:users`, `write:users`, `delete:users`
-   - Assign permissions to roles as needed
-
-4. **Create a Machine to Machine Application** (for API access)
-   - Go to Applications > Applications
-   - Click "Create Application"
-   - Choose "Machine to Machine Applications"
-   - Authorize it for your API
-   - Grant the necessary permissions
-
-## Environment Configuration
-
-Add the following environment variables to your `.env` file or run configuration:
-
-```bash
-# Auth0 Configuration
-AUTH0_ISSUER_URI=https://your-tenant.auth0.com/
-AUTH0_AUDIENCE=your-api-identifier
-AUTH0_ROLES_CLAIM_NAMESPACE=https://your-tenant.auth0.com/roles  # Optional: for custom roles namespace
-```
-
-## Run the project
-1. Clone it
-2. Create `.env` file following `.env.example` and add Auth0 configuration
-3. Run `docker compose up -d`
-4. Log in to pgadmin and add the server connection:
-   - Click in Servers>Register>Server
-   - Add a custom name
-   - In Connection:
-     - Host: the postgres service name in docker compose
-     - Port: the postgres service port in docker compose
-     - Username: the postgres name in `POSTGRES_USER` in `.env`
-     - Password: the postgres password in `POSTGRES_PASSWORD` in `.env`
-   - Save
-5. Click in Servers>$YOUR_SERVER>DATABASE>security>Schemas>Create>Schema
-6. Add `security` schema and click en save
-7. In the project, in run options, edit configuration and add:
-   - `POSTGRES_URL` with the value defined in `.env`
-   - `AUTH0_ISSUER_URI` with your Auth0 issuer URI
-   - `AUTH0_AUDIENCE` with your API identifier
-   - `AUTH0_ROLES_CLAIM_NAMESPACE` (optional) with your roles namespace
-8. Run the project.
+- Auth0 JWT authentication (RS256)
+- Role-based access control (`ADMIN`, `USER`)
+- Permission-based authorization (`read:books`, `write:books`, `delete:books`)
+- Public endpoints (no auth required)
+- Protected CRUD endpoints with `@PreAuthorize`
+- CORS configuration
+- Health probe at `/api/public/health`
 
 ## API Endpoints
 
-### Public Endpoints (No Authentication Required)
-- `GET /api/public/health` - Health check
-- `GET /api/public/info` - API information
-- `GET /api/public/welcome` - Welcome message
+### Public (no token required)
 
-### Protected Endpoints (Require Auth0 JWT Token)
-- `GET /api/users` - Get all users (requires `read:users` permission or `USER`/`ADMIN` role)
-- `GET /api/users/{id}` - Get user by ID (requires `read:users` permission or `USER`/`ADMIN` role)
-- `POST /api/users` - Create user (requires `write:users` permission or `ADMIN` role)
-- `PUT /api/users/{id}` - Update user (requires `write:users` permission or `ADMIN` role)
-- `DELETE /api/users/{id}` - Delete user (requires `delete:users` permission or `ADMIN` role)
+| Method | Path | Description |
+| --- | --- | --- |
+| GET | `/api/public/health` | Health check (k8s probe target) |
+| GET | `/api/public/info` | API information |
+| GET | `/api/public/welcome` | Welcome message |
 
-## Testing with Auth0
+### Protected (Bearer JWT required)
 
-To test the API, you'll need to obtain a JWT token from Auth0:
+| Method | Path | Required permission / role |
+| --- | --- | --- |
+| GET | `/api/users` | `read:books` or `USER`/`ADMIN` |
+| GET | `/api/users/{id}` | `read:books` or `USER`/`ADMIN` |
+| POST | `/api/users` | `write:books` or `ADMIN` |
+| PUT | `/api/users/{id}` | `write:books` or `ADMIN` |
+| DELETE | `/api/users/{id}` | `delete:books` or `ADMIN` |
 
-1. Use Auth0's test token endpoint or your M2M application credentials
-2. Include the token in the `Authorization` header:
-   ```
-   Authorization: Bearer <your-jwt-token>
-   ```
+## Auth0 setup
 
-Example with curl:
+1. **Create an Auth0 account** at [auth0.com](https://auth0.com).
+2. **Create an API** in *Applications → APIs*:
+   - Identifier (audience): `https://spring-api`
+   - Add permissions: `read:books`, `write:books`, `delete:books`
+3. **Create roles** in *User Management → Roles*: `ADMIN`, `USER`. Assign permissions to them.
+4. **Create a Machine-to-Machine application** (for Auth0 management API calls):
+   - Go to *Applications → Applications → Create Application → Machine to Machine*
+   - Authorize it for your API and grant the needed permissions.
+5. Note your **Domain** (`dev-xxxx.us.auth0.com`), **Client ID**, and **Client Secret**.
+
+## Environment variables
+
+| Variable | Description |
+| --- | --- |
+| `POSTGRES_URL` | JDBC URL — `jdbc:postgresql://postgres:5432/security` |
+| `AUTH0_ISSUER_URI` | Auth0 tenant URL with trailing slash, e.g. `https://dev-xxxx.us.auth0.com/` |
+| `AUTH0_AUDIENCE` | API identifier, e.g. `https://spring-api` |
+| `AUTH0_ROLES_CLAIM_NAMESPACE` | Custom claim namespace for roles, e.g. `https://spring-api/roles` |
+| `AUTH0_CLIENT_ID` | Machine-to-Machine app client ID |
+| `AUTH0_CLIENT_SECRET` | Machine-to-Machine app client secret |
+
+Copy `.env.example` to `.env` and fill in the values before running locally.
+
+## Local development (Docker Compose)
+
 ```bash
-curl -X GET http://localhost:8080/api/users \
-  -H "Authorization: Bearer YOUR_JWT_TOKEN"
+cp .env.example .env          # fill in AUTH0_* and POSTGRES_* values
+docker compose up -d          # starts postgres on host port 5433
+# then run the Spring Boot app from your IDE with the .env vars in run config
 ```
+
+The compose file starts only PostgreSQL. Run the Spring Boot app from your IDE, passing the environment variables from `.env` in the run configuration.
+
+## Kubernetes deployment
+
+### Prerequisites
+
+- [Docker](https://docs.docker.com/get-docker/)
+- [minikube](https://minikube.sigs.k8s.io/docs/start/) (or any k8s cluster)
+- [kubectl](https://kubernetes.io/docs/tasks/tools/)
+
+### Architecture
+
+```
+namespace: spring-security
+┌─────────────────────────────────────────────────────────┐
+│                                                         │
+│  Deployment: spring-security-api (2 replicas)           │
+│    image: springsecurity-api:0.0.1                      │
+│    → Service: spring-security-api (ClusterIP port 80)  │
+│                                                         │
+│  StatefulSet: postgres (1 replica, 2 Gi PVC)            │
+│    image: postgres:16-alpine                            │
+│    → Service: postgres (headless, port 5432)            │
+│                                                         │
+│  Secrets:                                               │
+│    spring-security-api-secret  (POSTGRES_URL,           │
+│                                 AUTH0_CLIENT_ID,         │
+│                                 AUTH0_CLIENT_SECRET)    │
+│    postgres-secret             (POSTGRES_USER,          │
+│                                 POSTGRES_PASSWORD)      │
+└─────────────────────────────────────────────────────────┘
+```
+
+### Step 1 — Build and load the Docker image
+
+```bash
+cd springSecurity
+
+# Build the image
+docker build -t springsecurity-api:0.0.1 .
+
+# Load it into minikube's local registry
+minikube image load springsecurity-api:0.0.1
+```
+
+### Step 2 — Create Kubernetes Secrets
+
+Secrets are **not** stored in the manifests. Create them manually:
+
+```bash
+# Create the namespace first so the secrets land in the right place
+kubectl apply -f k8s/namespace.yaml
+
+# PostgreSQL credentials
+kubectl create secret generic postgres-secret \
+  --namespace spring-security \
+  --from-literal=POSTGRES_USER='security' \
+  --from-literal=POSTGRES_PASSWORD='<your-postgres-password>'
+
+# Spring Boot app secrets
+kubectl create secret generic spring-security-api-secret \
+  --namespace spring-security \
+  --from-literal=POSTGRES_URL='jdbc:postgresql://postgres:5432/security' \
+  --from-literal=AUTH0_CLIENT_ID='<your-m2m-client-id>' \
+  --from-literal=AUTH0_CLIENT_SECRET='<your-m2m-client-secret>'
+```
+
+> The `POSTGRES_USER` and `POSTGRES_PASSWORD` values must match those in `POSTGRES_URL`.
+
+### Step 3 — Apply the manifests
+
+```bash
+# Deploy PostgreSQL (StatefulSet + headless Service)
+kubectl apply -f k8s/postgres-service.yaml
+kubectl apply -f k8s/postgres-statefulset.yaml
+
+# Deploy the API (Deployment + ClusterIP Service)
+kubectl apply -f k8s/service.yaml
+kubectl apply -f k8s/deployment.yaml
+```
+
+Or apply everything at once (namespace must already exist):
+
+```bash
+kubectl apply -f k8s/
+```
+
+### Step 4 — Verify pods are running
+
+```bash
+kubectl get pods -n spring-security
+# NAME                                    READY   STATUS    RESTARTS
+# spring-security-api-<hash>-<hash>       1/1     Running   0
+# spring-security-api-<hash>-<hash>       1/1     Running   0
+# postgres-0                              1/1     Running   0
+```
+
+The API pods use a readiness probe on `/api/public/health` with a 20 s initial delay — allow ~30–60 s for the JVM to start.
+
+### Step 5 — Access the API
+
+The service is `ClusterIP` (internal only). Port-forward to reach it locally:
+
+```bash
+kubectl port-forward service/spring-security-api 8080:80 -n spring-security
+```
+
+```bash
+# Public endpoint — no token needed
+curl http://localhost:8080/api/public/health
+
+# Protected endpoint — attach a valid Auth0 JWT
+curl http://localhost:8080/api/users \
+  -H "Authorization: Bearer <your-jwt-token>"
+```
+
+Swagger UI: `http://localhost:8080/swagger-ui.html`
+
+### Obtaining a JWT for testing (M2M / client-credentials)
+
+```bash
+curl -s --request POST \
+  --url "https://<AUTH0_DOMAIN>/oauth/token" \
+  --header "content-type: application/json" \
+  --data '{
+    "client_id":     "<M2M_CLIENT_ID>",
+    "client_secret": "<M2M_CLIENT_SECRET>",
+    "audience":      "https://spring-api",
+    "grant_type":    "client_credentials"
+  }' | jq -r '.access_token'
+```
+
+### Teardown
+
+```bash
+kubectl delete namespace spring-security
+```
+
+This removes all resources in the namespace, including PostgreSQL's PersistentVolumeClaim.

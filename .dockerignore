@@ -1,0 +1,29 @@
+# Build output
+build/
+.gradle/
+out/
+bin/
+
+# IDE
+.idea/
+.vscode/
+*.iml
+*.iws
+*.ipr
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# Local config & data
+.env
+volumes/
+
+# Docs
+README.md
+HELP.md
+
+# Kubernetes
+k8s/
+compose.yaml
